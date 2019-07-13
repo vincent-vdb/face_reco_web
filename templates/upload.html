@@ -18,18 +18,10 @@ function drop(ev) {
   ev.target.appendChild(document.getElementById(data));
 }
 </script>
-
 </head>
 
 <body>
 	Add here the file you want to add as a reference.
-
-
-<div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-
-<img id="drag1" src="img_logo.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
-
-
 	<form method=POST enctype=multipart/form-data action="{{url_for('upload', person=person) }}">
 		<input type=file name=photo multiple>
 		<input type="submit">
