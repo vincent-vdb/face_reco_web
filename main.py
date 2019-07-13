@@ -14,9 +14,11 @@ import numpy as np
 import face_recognition
 import cv2
 
+from flask_dropzone import Dropzone
 
 
 app = Flask(__name__)
+dropzone = Dropzone(app)
 
 
 # instantiate an object that will upload images, with name 'photos'
@@ -32,6 +34,18 @@ app.config['UPLOADED_PHOTOS_DEST'] = 'static/img/'
 
 configure_uploads(app, photos)
 
+# Dropzone settings
+app.config['DROPZONE_UPLOAD_MULTIPLE'] = True
+#app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
+app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image'
+app.config['DROPZONE_REDIRECT_VIEW'] = 'upload_results'
+
+
+# Uploads settings
+#app.config['UPLOADED_PHOTOS_DEST'] = os.getcwd() + '/static/img/vincent'
+#photos = UploadSet('photos', IMAGES)
+#configure_uploads(app, photos)
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -40,7 +54,32 @@ def home():
 # be able to perform future face recognition on this person
 @app.route('/upload/<person>', methods=['GET', 'POST'])
 def upload(person):	
-	person = person.lower()
+
+	path_to_save = os.path.join('static/img/'+person)
+
+	if not os.path.isdir(path_to_save):
+		os.makedirs(path_to_save)
+	app.config['UPLOADED_PHOTOS_DEST'] = path_to_save
+	configure_uploads(app, photos)
+
+	if request.method == 'POST':
+		file_obj = request.files
+		for f in file_obj:
+			file = request.files.get(f)
+
+			# save the file with to our photos folder
+			filename = photos.save(
+				file,
+				name=file.filename    
+			)
+			# encode image
+			encode_image(path_to_save+'/'+filename)
+
+			return "uploading..."
+	return render_template('upload.html', person=person)
+
+	"""
+    person = person.lower()
 
 	if request.method == 'POST' and 'photo' in request.files:
 
@@ -61,6 +100,7 @@ def upload(person):
 
 		return "upload and encoding complete"
 	return render_template('upload.html', person=person)
+	"""
 
 # compute the face recognition on the image given in the form of
 # face_recon.html, and display the result in output.html
@@ -84,6 +124,10 @@ def face_recon():
 
 	return render_template('face_recon.html')
 
+
+@app.route('/upload_results')
+def upload_results():
+    return render_template('upload_results.html')
 
 #@app.route('/camera_recon')
 

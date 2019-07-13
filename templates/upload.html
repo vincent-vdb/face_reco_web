@@ -1,14 +1,21 @@
 <html>
 <head>
 	<title>Upload a reference file</title>
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 20%; min-height: 200px;') }}
+
 </head>
 
 <body>
-	Add here the file you want to add as a reference.
-	<form method=POST enctype=multipart/form-data action="{{url_for('upload', person=person) }}">
-		<input type=file name=photo multiple>
-		<input type="submit">
-	</form>
+	Drop files in the below area or click to upload photos.
+  {{ dropzone.load_js() }}
+  {{ dropzone.create(action=url_for('upload', person=person)) }}
+
+
+	<p class="lead">
+		Once the upload done, feel free to add pictures for other persons. </br>
+		You can go back to the <a href="/">home</a>, or perform <a href="/face_recon">face recon</a>.
+	</p>
 
 </body>
 </html>
